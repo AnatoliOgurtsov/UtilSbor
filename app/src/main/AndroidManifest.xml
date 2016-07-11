@@ -1,0 +1,55 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="by.a_ogurtsov.utilsbor">
+
+    <application android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher_us"
+        android:theme="@style/My_theme_main_activity">
+
+
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.Vybor_obema_us"
+            android:label="@string/title_activity_vybor_obema_us"
+            android:theme="@style/my_dialog_noactionBar"
+                        >
+        </activity>
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.Vybor_massa_us_n1n2n3_1"
+            android:label="Выбор массы"
+            android:theme="@style/my_dialog_noactionBar">
+        </activity>
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.Vybor_massa_us_n1n2n3_2"
+            android:label="Выбор массы"
+            android:theme="@style/my_dialog_noactionBar">
+        </activity>
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.Vybor_obema_us_m2m3"
+            android:label="@string/title_activity_vybor_obema_us"
+            android:theme="@style/my_dialog_noactionBar" >
+        </activity>
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.Vybor_massa_us_samosval"
+            android:label="@string/title_activity_vybor_obema_us"
+            android:theme="@style/my_dialog_noactionBar" >
+        </activity>
+
+        <activity
+            android:name="by.a_ogurtsov.utilsbor.About"
+            android:label="@string/about"
+            android:theme="@style/my_dialog_noactionBar" >
+        </activity>
+
+
+    </application>
+
+</manifest>

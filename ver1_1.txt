@@ -1,0 +1,782 @@
+package by.a_ogurtsov.utilsbor;
+
+import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link Fragment_util_sbor#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class Fragment_util_sbor extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+    final Integer stavka1 = 20000, stavka2 = 150000;
+    final String LOG_TAG = "myLogs";
+    final String ATTRIBUTE_CAT = "cat";
+    final String ATTRIBUTE_CAT_INFO = "cat_info";
+    final String ATTRIBUTE_CAT_IMAGE = "cat_image";
+    private Spinner spinner_cat;
+    MySimpleAdapter sAdapter;
+    View child;
+    FrameLayout FL;
+    RadioGroup rg_m1, rg_n1, rg_m2, rg_spec;
+    TextView itog, itog_stavka, do3, ot3, poloska_do3, poloska_ot3, baz_stavka, tv_samosval_massa;
+    int vozrast = 1, category = 1;
+    OnClickListener radiolistener;
+    RadioGroup.OnCheckedChangeListener rg_m1_listener, rg_spec_listener;
+    Intent intent;
+    RadioButton rb2, rb3, rb4, rb5, rb6, rb1_spec, rb2_spec;
+    String[] cat_info, cat;
+    CheckBox checkbox_m2m3, checkbox_n1n2n3;
+    OnCheckedChangeListener special_listener;
+    int i_temp;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment Fragment_util_sbor.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static Fragment_util_sbor newInstance(String param1, String param2) {
+        Fragment_util_sbor fragment = new Fragment_util_sbor();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public Fragment_util_sbor() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        cat = getResources().getStringArray(R.array.cat);
+        cat_info = getResources().getStringArray(R.array.cat_info);
+        int[] cat_image = {R.drawable.ic_legk_car, R.drawable.ic_micro_bus, R.drawable.ic_bus, R.drawable.ic_gruz_3_5, R.drawable.ic_gruz_5_12, R.drawable.ic_gruz_12_, R.drawable.ic_samosval};
+        //=======готовим данные для спиннера выбора категорий
+        ArrayList<Map<String, Object>> cat_data = new ArrayList<Map<String, Object>>(cat.length);
+        Map<String, Object> m;
+        for (int i = 0; i < cat.length; i++) {
+            m = new HashMap<String, Object>();
+            m.put(ATTRIBUTE_CAT, cat[i]);
+            m.put(ATTRIBUTE_CAT_INFO, cat_info[i]);
+            m.put(ATTRIBUTE_CAT_IMAGE, cat_image[i]);
+            cat_data.add(m);
+        }
+        //====================================================
+        String[] from = {ATTRIBUTE_CAT, ATTRIBUTE_CAT_INFO, ATTRIBUTE_CAT_IMAGE};
+        int[] to = {R.id.tv_cat, R.id.tv_cat_info, R.id.tv_cat_image};
+        sAdapter = new MySimpleAdapter(this.getActivity(), cat_data, R.layout.spinner_item_us_category_ts, from, to);
+
+
+
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_util_sbor, container, false);
+        FL = (FrameLayout) v.findViewById(R.id.FL1);
+        itog = (TextView) v.findViewById(R.id.tv);
+        itog_stavka = (TextView) v.findViewById(R.id.tv_rezult_stav);
+        baz_stavka = (TextView) v.findViewById(R.id.bazovaya_stavka);
+       // String custom_font = "Roboto-Regular.ttf";
+       // Typeface CF = Typeface.createFromAsset(getActivity().getAssets(), custom_font);
+       // baz_stavka.setTypeface(CF);
+
+//======================
+        do3 = (TextView) v.findViewById(R.id.tv_do3);
+        ot3 = (TextView) v.findViewById(R.id.tv_ot3);
+        poloska_do3 = (TextView) v.findViewById(R.id.poloska_do3);
+        poloska_ot3 = (TextView) v.findViewById(R.id.poloska_ot3);
+
+//============================  слушатель специальные ТС
+        special_listener = new OnCheckedChangeListener() {
+            int temp_category;
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+
+                if (isChecked){
+                  temp_category = category;
+                  rg_spec.setVisibility(View.VISIBLE);
+                  if (i_temp==1) {
+                      rg_m2.setVisibility(View.INVISIBLE);
+                  }
+                  if (i_temp==2) {
+                      rg_n1.setVisibility(View.INVISIBLE);
+                  }
+
+                 rg_spec.check(R.id.radioButton1_spec);
+
+                }else{
+                    rg_spec.clearCheck();
+                    rg_spec.setVisibility(View.INVISIBLE);
+
+                     if (i_temp==1) {
+                         rg_m2.setVisibility(View.VISIBLE);
+                     }
+                     if (i_temp==2) {
+                         rg_n1.setVisibility(View.VISIBLE);
+                     }
+                     category = temp_category;
+                     itog(vozrast,category);
+                }
+            }
+        };
+//========================================================================
+        rg_spec_listener = new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.radioButton1_spec:
+                        category = 25;
+                        itog(vozrast, category);
+
+                        break;
+                    case R.id.radioButton2_spec:
+                        category = 26;
+                        itog(vozrast, category);
+
+                        break;
+
+                }
+            }
+        };
+
+
+//==============================================
+        radiolistener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.tv_do3:
+                        Log.d(LOG_TAG, "Good3");
+                        vozrast = 1;
+                        poloska_do3.setBackgroundColor(getResources().getColor(R.color.banner));
+                        poloska_ot3.setBackgroundColor(getResources().getColor(R.color.whiteblue));
+                        itog(vozrast, category);
+                        break;
+                    case R.id.tv_ot3:
+                        Log.d(LOG_TAG, "Good4");
+                        vozrast = 2;
+                        poloska_do3.setBackgroundColor(getResources().getColor(R.color.whiteblue));
+                        poloska_ot3.setBackgroundColor(getResources().getColor(R.color.banner));
+                        itog(vozrast, category);
+                        break;
+                    case R.id.radioButton2:  // в М1
+                        //реализовать startActivity for rezult
+                        intent = new Intent(getActivity().getBaseContext(), Vybor_obema_us.class);
+                        startActivityForResult(intent, 1);
+                        break;
+                    case R.id.radioButton1_N:  // в N1N2N3
+                        //реализовать startActivity for rezult
+                        rb4.setText(getResources().getString(R.string.a10));
+                        intent = new Intent(getActivity().getBaseContext(), Vybor_massa_us_n1n2n3_1.class);
+                        startActivityForResult(intent, 1);
+                        break;
+                    case R.id.radioButton2_N:  // в N1N2N3
+                        rb3.setText(getResources().getString(R.string.a9));
+                        //реализовать startActivity for rezult
+                        intent = new Intent(getActivity().getBaseContext(), Vybor_massa_us_n1n2n3_2.class);
+                        startActivityForResult(intent, 1);
+                        break;
+                    case R.id.radioButton1_M2M3:
+                        category = 8;
+                        rb6.setText(getResources().getString(R.string.a2));
+                        itog(vozrast, category);
+                        break;
+                    case R.id.radioButton2_M2M3:
+                        //реализовать startActivity for rezult
+                        intent = new Intent(getActivity().getBaseContext(), Vybor_obema_us_m2m3.class);
+                        startActivityForResult(intent, 1);
+                        break;
+                    case R.id.textview1_sam:
+                        //реализовать startActivity for rezult
+                        intent = new Intent(getActivity().getBaseContext(), Vybor_massa_us_samosval.class);
+                        startActivityForResult(intent, 1);
+
+
+                }
+            }
+        };
+
+        do3.setOnClickListener(radiolistener);
+        ot3.setOnClickListener(radiolistener);
+//=================
+
+        spinner_cat = (Spinner) v.findViewById(R.id.spinner_vid_TS_util);
+        spinner_cat.setAdapter(sAdapter);
+        spinner_cat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // надо очистить контейнер
+                if (FL != null) {
+                    FL.removeView(child);
+                }
+                switch (position) {
+                    case 0:  //M1=================================================================
+                        category = 1;
+                        baz_stavka.setText(stavka1.toString() + " рос. рублей");
+                        child = inflater.inflate(R.layout.m1, null);
+                        FL.addView(child);
+                        itog(vozrast, category);
+                        rg_m1 = (RadioGroup) FL.findViewById(R.id.RG_M1);
+                        rg_m1.check(R.id.radioButton1);
+                        rb2 = (RadioButton) rg_m1.findViewById(R.id.radioButton2);
+                        rb2.setOnClickListener(radiolistener);
+                        rg_m1_listener = new RadioGroup.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                switch (checkedId) {
+                                    case (R.id.radioButton1):
+                                        rb2.setText(getResources().getString(R.string.a2));
+                                        Log.d(LOG_TAG, "Good5");
+                                        category = 1;
+                                        itog(vozrast, category);
+
+                                        break;
+                                    case (R.id.radioButton2):
+                                        Log.d(LOG_TAG, "Good6");
+                                        // нажатие на выбор объема реализовано в onClickListener
+
+
+                                        break;
+                                    case (R.id.radioButton3):
+                                        rb2.setText(getResources().getString(R.string.a2));
+                                        Log.d(LOG_TAG, "Good7");
+                                        category = 7;
+                                        itog(vozrast, category);
+                                        break;
+                                }
+                            }
+                        };
+                        rg_m1.setOnCheckedChangeListener(rg_m1_listener);
+                        break;
+                    case 1:  //M2=================================================================
+                    case 2:  //M3=================================================================
+                        // категории 8-12
+                        i_temp = 1;  // для специального слушателя
+                        category = 8;
+                        baz_stavka.setText(stavka2.toString() + " рос. рублей");
+                        child = inflater.inflate(R.layout.m2m3, null);
+                        FL.addView(child);
+                        rg_m2 = (RadioGroup) FL.findViewById(R.id.RG_M2M3);
+                        rg_m2.check(R.id.radioButton1_M2M3);
+                        rb5 = (RadioButton) rg_m2.findViewById(R.id.radioButton1_M2M3);
+                        rb6 = (RadioButton) rg_m2.findViewById(R.id.radioButton2_M2M3);
+                        rb5.setOnClickListener(radiolistener);
+                        rb6.setOnClickListener(radiolistener);
+
+                        checkbox_m2m3 = (CheckBox) FL.findViewById(R.id.checkBox_M2M3);
+                        checkbox_m2m3.setOnCheckedChangeListener(special_listener);
+                        itog(vozrast, category);
+
+                        rg_spec = (RadioGroup)FL.findViewById(R.id.RG_spec);
+                        rb1_spec = (RadioButton)FL.findViewById(R.id.radioButton1_spec);
+                        rb2_spec = (RadioButton)FL.findViewById(R.id.radioButton2_spec);
+
+
+                        rg_spec.setOnCheckedChangeListener(rg_spec_listener);
+
+
+
+                        break;
+                    case 3:  //N1=================================================================
+                    case 4:  //N2=================================================================
+                    case 5:  //N3=================================================================
+                        i_temp = 2;  // для специального слушателя
+                        category = 13;
+                        baz_stavka.setText(stavka2.toString() + " рос. рублей");
+                        child = inflater.inflate(R.layout.n1n2n3, null);
+                        FL.addView(child);
+                        rg_n1 = (RadioGroup) FL.findViewById(R.id.RG_N1N2N3);
+                        rg_n1.check(R.id.radioButton1_N);
+                        rb3 = (RadioButton) rg_n1.findViewById(R.id.radioButton1_N);
+                        rb4 = (RadioButton) rg_n1.findViewById(R.id.radioButton2_N);
+                        rb3.setOnClickListener(radiolistener);
+                        rb4.setOnClickListener(radiolistener);
+
+
+                        checkbox_n1n2n3 = (CheckBox) FL.findViewById(R.id.checkBox_N1N2N3);
+                        checkbox_n1n2n3.setOnCheckedChangeListener(special_listener);
+                        itog(vozrast, category);
+
+                        rg_spec = (RadioGroup)FL.findViewById(R.id.RG_spec_n);
+                        rb1_spec = (RadioButton)FL.findViewById(R.id.radioButton1_spec);
+                        rb2_spec = (RadioButton)FL.findViewById(R.id.radioButton2_spec);
+
+                        rg_spec.setOnCheckedChangeListener(rg_spec_listener);
+
+                        break;
+                    case 6:  // Самосвал==========================================================
+                        category = 22;
+                        baz_stavka.setText(stavka2.toString() + " рос. рублей");
+                        child = inflater.inflate(R.layout.samosval, null);
+                        FL.addView(child);
+                        tv_samosval_massa = (TextView) FL.findViewById(R.id.textview1_sam);
+                        tv_samosval_massa.setText(getResources().getString(R.string.a22));
+                        tv_samosval_massa.setOnClickListener(radiolistener);
+                        itog(vozrast, category);
+
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                itog(vozrast, category);
+            }
+        });
+
+        return v;
+    }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        category = Integer.valueOf(data.getStringExtra("category"));
+        itog(vozrast, category);
+
+    }
+
+    class MySimpleAdapter extends SimpleAdapter {
+
+        /**
+         * Constructor
+         *
+         * @param context  The context where the View associated with this SimpleAdapter is running
+         * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
+         *                 Maps contain the data for each row, and should include all the entries specified in
+         *                 "from"
+         * @param resource Resource identifier of a view layout that defines the views for this list
+         *                 item. The layout file should include at least those named views defined in "to"
+         * @param from     A list of column names that will be added to the Map associated with each
+         *                 item.
+         * @param to       The views that should display column in the "from" parameter. These should all be
+         *                 TextViews. The first N views in this list are given the values of the first N columns
+         */
+        public MySimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+            super(context, data, resource, from, to);
+        }
+
+        @Override
+        public void setViewText(TextView v, String text) {
+            super.setViewText(v, text);
+
+            if (v.getId() == R.id.tv_cat) {
+                if (text.equals("Самосвал"))
+                    v.setTextColor(getResources().getColor(R.color.banner));
+                else v.setTextColor(getResources().getColor(R.color.banner));
+            }
+            //if (v.getId() == R.id.tv_cat_info){
+            //    if (text.equals(cat_info[6])){
+
+            //        switch (category){
+            //            case 22:
+            //                v.setText("1");
+            //                break;
+            //            case 23:
+            //                v.setText("2");
+
+            //                break;
+             //           case 24:
+            //                v.setText("3");
+            //            break;
+            //        }
+                   // v.setText(cat_info[6]);
+            //    }
+
+            //}
+        }
+
+        @Override
+        public void setViewImage(ImageView v, int value) {
+            super.setViewImage(v, value);
+        }
+    }
+
+    public void itog(int vozrast, int category) {
+        int i;
+        switch (vozrast) {
+            case 1: // до 3 лет
+                switch (category) {
+                    case 0:
+                        itog.setText("Hello");
+                        break;
+                    case 1:
+                        i = (int) (stavka1 * 0.86);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("0.86 базовой ставки");
+                        break;
+                    case 2:
+                        i = (int) (stavka1 * 0.86);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("0.86 базовой ставки");
+                        rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a4));
+                        break;
+                    case 3:
+                        i = (int) (stavka1 * 1.34);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("1.34 базовой ставки");
+                        rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a5));
+                        break;
+                    case 4:
+                        i = (int) (stavka1 * 2.56);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("2.56 базовой ставки");
+                        rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a6));
+                        break;
+                    case 5:
+                        i = (int) (stavka1 * 3.47);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("3.47 базовой ставки");
+                        rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a7));
+                        break;
+                    case 6:
+                        i = (int) (stavka1 * 5.5);
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        itog_stavka.setText("5.5 базовой ставки");
+                        rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a8));
+                        break;
+                    case 7:
+                        i = (int) (stavka1 * 0.1);
+                        itog_stavka.setText("0.1 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        break;
+                    // m2 и m3
+                    case 8:
+                        i = (int) (stavka2 * 0.6);
+                        itog_stavka.setText("0.6 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        break;
+                    case 9:
+                        i = (int) (stavka2 * 0.6);
+                        itog_stavka.setText("0.6 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a18));
+                        break;
+                    case 10:
+                        i = (int) (stavka2 * 1.2);
+                        itog_stavka.setText("1.2 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a19));
+                        break;
+                    case 11:
+                        i = (int) (stavka2 * 1.6);
+                        itog_stavka.setText("1.6 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a20));
+                        break;
+                    case 12:
+                        i = (stavka2 * 2);
+                        itog_stavka.setText("2 базовые ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a21));
+                        break;
+                    // n1, n2,n3
+                    case 13:
+                        i = (int) (stavka2 * 0.5);
+                        itog_stavka.setText("0.5 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a11));
+
+                        break;
+                    case 14:
+                        i = (int) (stavka2 * 0.8);
+                        itog_stavka.setText("0.8 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a12));
+                        break;
+                    case 15:
+                        i =  (stavka2 * 1);
+                        itog_stavka.setText("1 базовая ставка");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a13));
+                        break;
+                    case 16:
+                        i = (int) (stavka2 * 1.1);
+                        itog_stavka.setText("1.1 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a14));
+                    break;
+                    case 17:
+                        i = (int) (stavka2 * 1.34);
+                        itog_stavka.setText("1.34 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a15));
+                        break;
+                    case 18:
+                        i = (int) (stavka2 * 1.47);
+                        itog_stavka.setText("1.47 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a16));
+                        break;
+                    case 19:
+                        i = (int) (stavka2 * 2.9);
+                        itog_stavka.setText("2.9 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a17));
+                        break;
+                    case 20:
+                        i = (int) (stavka2 * 1.47);
+                        itog_stavka.setText("1.47 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb4.setText(getResources().getString(R.string.a10) + " " + getResources().getString(R.string.a16));
+                        break;
+                    case 21:
+                        i = (int) (stavka2 * 2.9);
+                        itog_stavka.setText("2.9 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        rb4.setText(getResources().getString(R.string.a10) + " " + getResources().getString(R.string.a17));
+                        break;
+                    // самосвал
+                    case 22:
+                        i = (int) (stavka2 * 13.6);
+                        itog_stavka.setText("13.6 базовой ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        tv_samosval_massa.setText(getResources().getString(R.string.a22));
+                        break;
+                    case 23:
+                        i = (int) (stavka2 * 25);
+                        itog_stavka.setText("25 базовых ставок");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        tv_samosval_massa.setText(getResources().getString(R.string.a23));
+                        break;
+                    case 24:
+                        i = (int) (stavka2 * 37);
+                        itog_stavka.setText("37 базовых ставок");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        tv_samosval_massa.setText(getResources().getString(R.string.a24));
+                        break;
+                    // специальные
+                    case 25:
+                        i =  stavka2 * 1;
+                        itog_stavka.setText("1 базовая ставка");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        break;
+                    case 26:
+                        i = stavka2 * 3;
+                        itog_stavka.setText("3 базовые ставки");
+                        itog.setText(Integer.toString(i) + " рос. рублей");
+                        break;
+
+
+                }
+                break;
+            ////////////////////////////////////////////////////////////////
+            case 2:  // от 3 лет
+                switch (vozrast) {
+                    case 2: // до 3 лет
+                        switch (category) {
+                            case 0:
+                                itog.setText("Hello");
+                                break;
+                            case 1:
+                                i = (int) (stavka1 * 5.3);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("5.3 базовой ставки");
+                                break;
+                            case 2:
+                                i = (int) (stavka1 * 5.3);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("5.3 базовой ставки");
+                                rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a4));
+                                break;
+                            case 3:
+                                i = (int) (stavka1 * 8.26);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("8.26 базовой ставки");
+                                rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a5));
+                                break;
+                            case 4:
+                                i = (int) (stavka1 * 16.12);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("16.12 базовой ставки");
+                                rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a6));
+                                break;
+                            case 5:
+                                i = (int) (stavka1 * 28.5);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("28.5 базовой ставки");
+                                rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a7));
+                                break;
+                            case 6:
+                                i = (int) (stavka1 * 35.01);
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                itog_stavka.setText("35.01 базовой ставки");
+                                rb2.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a8));
+                                break;
+                            case 7:
+                                i = (int) (stavka1 * 0.15);
+                                itog_stavka.setText("0.15 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                break;
+
+                            // m2 и m3
+                            case 8:
+                                i = (stavka2 * 1);
+                                itog_stavka.setText("1 базовая ставка");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                break;
+                            case 9:
+                                i =  (stavka2 * 1);
+                                itog_stavka.setText("1 базовая ставка");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a18));
+                                break;
+                            case 10:
+                                i =  (stavka2 * 3);
+                                itog_stavka.setText("3 базовые ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a19));
+                                break;
+                            case 11:
+                                i = (int) (stavka2 * 4.4);
+                                itog_stavka.setText("4.4 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a20));
+                                break;
+                            case 12:
+                                i = (int)(stavka2 * 5.2);
+                                itog_stavka.setText("5.2 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb6.setText(getResources().getString(R.string.a2) + " " + getResources().getString(R.string.a21));
+                                break;
+
+                            //n1, n2,n3
+                            case 13:
+                                i = (int) (stavka2 * 0.88);
+                                itog_stavka.setText("0.88 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a11));
+                                break;
+                            case 14:
+                                i = (int) (stavka2 * 1.25);
+                                itog_stavka.setText("1.25 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a12));
+                                break;
+                            case 15:
+                                i =  (int)(stavka2 * 1.6);
+                                itog_stavka.setText("1.6 базовая ставка");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a13));
+                                break;
+                            case 16:
+                                i = (int) (stavka2 * 4.56);
+                                itog_stavka.setText("4.56 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a14));
+                                break;
+                            case 17:
+                                i = (int) (stavka2 * 6.91);
+                                itog_stavka.setText("6.91 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a15));
+                                break;
+                            case 18:
+                                i = (int) (stavka2 * 10.06);
+                                itog_stavka.setText("10.06 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a16));
+                                break;
+                            case 19:
+                                i = (int) (stavka2 * 11.8);
+                                itog_stavka.setText("11.8 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb3.setText(getResources().getString(R.string.a9) + " " + getResources().getString(R.string.a17));
+                                break;
+                            case 20:
+                                i = (int) (stavka2 * 10.06);
+                                itog_stavka.setText("10.06 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb4.setText(getResources().getString(R.string.a10) + " " + getResources().getString(R.string.a16));
+                                break;
+                            case 21:
+                                i = (int) (stavka2 * 11.8);
+                                itog_stavka.setText("11.8 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                rb4.setText(getResources().getString(R.string.a10) + " " + getResources().getString(R.string.a17));
+                                break;
+                            case 22:
+                                i = (int) (stavka2 * 30.98);
+                                itog_stavka.setText("30.98 базовой ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                tv_samosval_massa.setText(getResources().getString(R.string.a22));
+                                break;
+                            case 23:
+                                i = stavka2 * 32;
+                                itog_stavka.setText("32 базовые ставки");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                tv_samosval_massa.setText(getResources().getString(R.string.a23));
+                                break;
+                            case 24:
+                                i = stavka2 * 40;
+                                itog_stavka.setText("40 базовых ставок");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                tv_samosval_massa.setText(getResources().getString(R.string.a24));
+                                break;
+
+                            // специальные
+                            case 25:
+                                i =  stavka2 * 10;
+                                itog_stavka.setText("10 базовых ставок");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                break;
+                            case 26:
+                                i = stavka2 * 13;
+                                itog_stavka.setText("13 базовых ставок");
+                                itog.setText(Integer.toString(i) + " рос. рублей");
+                                break;
+                        }
+                        break;
+                }
+
+        }
+    }
+}
+
